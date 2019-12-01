@@ -1,0 +1,39 @@
+version: '3'
+services:
+    blue:
+        build: ./deploy
+        expose:
+            - 5000
+        env_file:
+            - secrets.env
+        volumes:
+            - ./blue/app:/app
+            - ./blue/static:/app/static
+            - ./blue/templates:/app/templates
+    green:
+        build: ./deploy
+        expose:
+            - 5000
+        env_file:
+            - secrets.env
+        volumes:
+            - ./green/app:/app
+            - ./green/static:/app/static
+            - ./green/templates:/app/templates
+    nginx:
+        image: nginx:1.17.3-alpine
+        ports:
+            - 80:80
+            - 443:443
+            - 28378:28378
+        volumes:
+            - ./nginx:/etc/nginx/conf.d
+            - ./certbot/conf:/etc/letsencrypt
+            - ./certbot/www:/var/www/certbot
+        command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    certbot:
+        image: certbot/certbot
+        volumes:
+            - ./certbot/conf:/etc/letsencrypt
+            - ./certbot/www:/var/www/certbot
+        entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
