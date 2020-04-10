@@ -4,11 +4,11 @@ A simple blue-green nginx deployment using Docker
 ## Setup
 
 ### HTTP
-1. ./create-http-server.sh <domain> "blue"
+1. ./create-http-server.sh $domain "blue"
 2. docker-compose up -d
 
 ### HTTPS
-1. ./create-https-server.sh <domain> "blue"
+1. ./create-https-server.sh $domain "blue"
 2. ./init-letsencrypt.sh
 3. docker-compose up -d
 
